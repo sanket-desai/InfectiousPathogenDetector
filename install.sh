@@ -145,6 +145,17 @@ then
 	cd $home_folder/external/lofreq_star-2.1.2 && ./bootstrap && ./configure && make clean && make && make install && cd $home_folder
 fi
 
+#ncbi-genome download
+
+if [[ -z "$pip_version" ]]
+then 
+	echo "pip3 not found in path"
+	abort
+else		
+	pip3 install ncbi-genome-download
+fi
+
+
 echo >&2 '
 **************************************
 *** Download the databases 		****** 
@@ -202,15 +213,13 @@ echo >&2 '
 
 date > $home_folder/version.info
 echo -e "Hg38 Gencode version""\t"$LATEST >> $home_folder/version.info
-echo -e "Number of Pathogens Included in Primary Database""\t"$(ls data/primaryref/pathoref/primary_gbk | wc -l) >> $home_folder/version.info
-echo -e "Number of Pathogens Included in Secondary Database""\t"$(ls data/secondaryref/secondary_gbk | wc -l) >> $home_folder/version.info
+echo -e "Number of Pathogens Included in Primary Database""\t"$(wc -l data/annotation/pathoannotation.tsv | awk '{print $1}') >> $home_folder/version.info
+echo -e "Number of Pathogens Included in Secondary Database""\t"$(wc -l data/annotation/secondaryannotation.tsv | awk '{print $1}') >> $home_folder/version.info
 
 rm $gencode_fasta_file $gencode_gff_file
 if [[ -d  $home_folder/data/annotation/patho.ids.gbk ]];
 then 
-	cat $home_folder/data/annotation/patho.ids.gbk >> $home_folder/external/snpEff/data/ipd1060/genes.gbk 
-	rm $home_folder/data/annotation/patho.ids.gbk
-	rm $home_folder/data/annotation/secondarydb.ids.gbk 
+	cat $home_folder/data/annotation/patho.ids.gbk >> $home_folder/external/snpEff/data/ipd1060/genes.gbk  
 else
 	echo "patho.ids.gbk file not found."
 	abort

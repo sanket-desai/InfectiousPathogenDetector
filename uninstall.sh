@@ -98,10 +98,19 @@ then
 	rm $home_folder/data/secondaryref/*
 fi	
 
-if [[ -f $home_folder/data/secondaryref/hspatho.gff ]]
+if [[ -f $home_folder/data/annotation/hspatho.gff ]]
 then
-	rm $home_folder/data/annotation/hspatho.gff
+	rm $home_folder/data/annotation/*.gff
+	rm $home_folder/data/annotation/*.gbk
+	rm $home_folder/data/annotation/*.tsv
+
 fi	
+
+if [[ -d $home_folder/data/annotation/gbktemp ]]
+then
+	rm -rf $home_folder/data/annotation/gbktemp
+fi
+
 
 if [[ -f $home_folder/version.info ]]
 then
