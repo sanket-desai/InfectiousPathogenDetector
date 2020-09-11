@@ -14,6 +14,7 @@ import subprocess
 import os
 import argparse
 import time
+import gzip
 '''
 create fasta given ncbi IDS
 '''
@@ -31,6 +32,7 @@ class IPDDatabaseCreator(object):
         self.secondarygbkfname_=GlobalVar.secondarydbids_+".gbk"
         self.primarypathoids_=[]
         pathoidfh=open(GlobalVar.pathoids_)
+        processedsecdbids=[]
         for p in pathoidfh:
             if not p.startswith("#"):
                 self.primarypathoids_.append(p.strip())
@@ -58,10 +60,14 @@ class IPDDatabaseCreator(object):
         pathogiter=SeqIO.parse(self.pathogbkfname_, "genbank")
         #Write pathogff, annotation and fasta for primary pathogen
         for pgenrec in pathogiter:
+            anno=self.gbtoannotationtsvrecord(pgenrec)
             pathogfffi.write("%s\n" %(self.gbtogffrecord(pgenrec)) )
-            pathoannfi.write("%s\n" %(self.gbtoannotationtsvrecord(pgenrec)))
+            pathoannfi.write("%s\n" %(anno))
+            secdbannfi.write("%s\n" %(anno))
             pgenrec.description=""
             SeqIO.write(pgenrec, pathofafi,"fasta")
+            SeqIO.write(pgenrec, secdbfafi, "fasta")
+            processedsecdbids.append(pgenrec.name)
         pathogfffi.close()
         pathoannfi.close()
         pathofafi.close()
@@ -92,23 +98,49 @@ class IPDDatabaseCreator(object):
             sys.exit(0)
         #write to secondary database annotation and fasta
         #Combine with primary and secondary
-        cmd="zcat ../data/annotation/gbktemp/*.gz >> " + self.secondarygbkfname_
-        cprocess=subprocess.run(cmd, shell=True)
-        cprocess.check_returncode()
-        cmd="cat "+self.pathogbkfname_ +" >> "+self.secondarygbkfname_,
-        secdbgiter=SeqIO.parse(self.secondarygbkfname_,"genbank")
-        print("Secondary database creation completed.")
-        #processed secondary ids
-        processedsecdbids=[]
-        for sgenrec in secdbgiter:
-            if not sgenrec.name in processedsecdbids:
-                secdbannfi.write("%s\n" %(self.gbtoannotationtsvrecord(sgenrec)))
-                sgenrec.description=""
-                SeqIO.write(sgenrec, secdbfafi,"fasta")
-                processedsecdbids.append()
-        print("Secondary database annotations created.")
-        secdbfafi.close()
-        secdbannfi.close()
+        #cmd="zcat ../data/annotation/gbktemp/*.gz >> ../data/annotation/secondarydb.ids.gbk"
+        #cprocess=subprocess.run(cmd, shell=True)
+        #cprocess.check_returncode()
+        gbktemp="../data/annotation/gbktemp/"
+        secdbgbkout=open("../data/annotation/secondarydb.ids.gbk",'w')
+        for g in os.listdir(gbktemp):
+            try:
+                gfi=gzip.open(gbktemp+g)
+                for i in gfi:
+                    secdbgbkout.write(i.decode('utf-8'))
+                gfi.close()
+            except Exception as e:
+                continue
+        #pathogbkfi=open(self.pathogbkfname_)
+        #for p in pathogbkfi:
+        #    secdbgbkout.write(p)
+        #    #this may need a \n
+        pathogbkfi.close()
+        secdbgbkout.close()
+        #cmd="cat "+self.pathogbkfname_ +" >> ../data/annotation/secondarydb.ids.gbk"
+        #cprocess=subprocess.run(cmd, shell=True)
+        #cprocess.check_returncode()
+        try:
+            secdbgiter=SeqIO.parse(self.secondarygbkfname_,"genbank")
+            print("Secondary database creation completed.")
+            #processed secondary ids
+            try:
+                for sgenrec in secdbgiter:
+                    if not sgenrec.name in processedsecdbids:
+                        secdbannfi.write("%s\n" %(self.gbtoannotationtsvrecord(sgenrec)))
+                        sgenrec.description=""
+                        SeqIO.write(sgenrec, secdbfafi,"fasta")
+                        processedsecdbids.append(sgenrec.name)
+            except ValueError as v:
+                print(v)
+                pass
+            print("Secondary database annotations created.")
+            secdbfafi.close()
+            secdbannfi.close()
+        except Exception as e:
+            print(e)
+            sys.exit(0)
+
     def idlist_to_localgb(self, l, fo): #Takes in the list of genbank ids
         Entrez.email="abc@xyz.com"
         max_tries=5 #try downloading 5 times
