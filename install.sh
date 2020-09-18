@@ -39,7 +39,7 @@ then
 fi
 #samtools
 
-if [[ ! -f $home_folder/external/htslib-1.10 ]];
+if [[ ! -d $home_folder/external/htslib-1.10 ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2
@@ -53,7 +53,7 @@ else
 	cd $home_folder/external/htslib && make clean && cd $home_folder
 fi
 
-if [[ ! -f $home_folder/external/samtools-1.10 ]];
+if [[ ! -d $home_folder/external/samtools-1.10 ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
@@ -67,7 +67,7 @@ else
 	cd $home_folder/external/samtools-1.10 && make clean && ./configure && make && cd $home_folder
 fi
 
-if [[ ! -f "$home_folder/external/bcftools" ]];
+if [[ ! -d "$home_folder/external/bcftools" ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/bcftools/releases/download/1.10/bcftools-1.10.tar.bz2
@@ -86,13 +86,19 @@ fi
 
 #freebayes (freebayes requires g++, camke, the standard C and C++ development libraries, liblzma, pthread, and libbzip2.)
 
-if [[ ! -f "$home_folder/external/freebayes" ]];
+if [[ ! -d "$home_folder/external/freebayes" ]];
 then
 	cd $home_folder/external/
 	wget http://clavius.bc.edu/~erik/freebayes/freebayes-5d5b8ac0.tar.gz
 	tar xzvf freebayes-5d5b8ac0.tar.gz
 	cd freebayes
-	echo "$SUDO_PASSWWORD" | sudo -S make && echo "$SUDO_PASSWWORD" | sudo -S make
+	if [ ! -f $home_folder/external/freebayes/bin/freebayes ];
+	then
+		echo "$SUDO_PASSWWORD" | sudo -S make && echo "$SUDO_PASSWWORD" | sudo -S make;
+	else
+		echo "Freebayes Installation Error !!!! Check the libraries."
+		abort
+	fi
 	cd $home_folder/external/
 	git clone --recursive https://github.com/vcflib/vcflib.git
 	cd $home_folder/external/vcflib
