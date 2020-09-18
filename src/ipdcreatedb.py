@@ -50,7 +50,7 @@ class IPDDatabaseCreator(object):
         pathogbkfi=open(self.pathogbkfname_,'a')
         #secdbgbkfi=open(self.secondarygbkfname_,'a')
         pathogfffi=open(GlobalVar.pathogff_,'w')
-        pathoannfi=open("../data/annotation/pathoannotation.tsv",'w')
+        pathoannfi=open("../data/annotation/primaryannotation.tsv",'w')
         secdbannfi=open("../data/annotation/secondaryannotation.tsv",'w')
         self.idlist_to_localgb(self.primarypathoids_, pathogbkfi)
         while len(self.failedgb_)>0:

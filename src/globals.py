@@ -42,7 +42,7 @@ class GlobalVar(object):
 	##snpEff variant annotation
 	snpeffdatadir_="./data"
 	snpeffgbk_="../external/snpEff/data/ipd1060/genes.gbk"
-	
+
 	pathofa_="../data/primaryref/pathoref/patho.fa"
 	blastndb_="../data/secondaryref/secondary.fa" #give human + pathogen db name
 	primaryannotationtsv_="../data/annotation/primaryannotation.tsv"
@@ -106,7 +106,7 @@ class GlobalVar(object):
 class PrimaryMetadata(object):
 	def __init__(self, anntsv):
 		fi=open(anntsv, 'r')
-		self.header_=fi.readline().strip().split("\t")
+		#self.header_=fi.readline().strip().split("\t")
 		self.metadata_={}
 		self.humanids_=[]
 		self.pathogenids_=[]
