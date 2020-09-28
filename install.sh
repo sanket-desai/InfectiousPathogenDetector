@@ -29,10 +29,6 @@ echo >&2 '
 *** Tools Installation 			******
 **************************************
 '
-
-read -s -p "Please enter password for sudo: " SUDO_PASSWWORD
-echo
-
 #fastp
 if [[ ! -f $home_folder/external/fastp-0.20.1/fastp ]];
 then
