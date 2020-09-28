@@ -37,12 +37,12 @@ class IPDDatabaseCreator(object):
             if not p.startswith("#"):
                 self.primarypathoids_.append(p.strip())
         pathoidfh.close()
-        self.secondarydbids_=[]
-        secdbidfh=open(GlobalVar.secondarydbids_)
-        for s in secdbidfh:
-            if not s.startswith("#"):
-                self.secondarydbids_.append(s.strip())
-        secdbidfh.close()
+        #self.secondarydbids_=[]
+        #secdbidfh=open(GlobalVar.secondarydbids_)
+        #for s in secdbidfh:
+        #    if not s.startswith("#"):
+        #        self.secondarydbids_.append(s.strip())
+        #secdbidfh.close()
         print("Read %d primary IDS.." %(len(self.primarypathoids_)) )
         #Open up the files for writing
         pathofafi=open(GlobalVar.pathofa_,'w')
@@ -103,13 +103,17 @@ class IPDDatabaseCreator(object):
         #cprocess.check_returncode()
         gbktemp="../data/annotation/gbktemp/"
         secdbgbkout=open("../data/annotation/secondarydb.ids.gbk",'w')
+        gind=0
         for g in os.listdir(gbktemp):
             try:
                 gfi=gzip.open(gbktemp+g)
                 for i in gfi:
                     secdbgbkout.write(i.decode('utf-8'))
                 gfi.close()
+                print("%d %s" %(gind+1, g))
+                gind+=1
             except Exception as e:
+                print("Could not open the gbk file : %s" %(g) )
                 continue
         #pathogbkfi=open(self.pathogbkfname_)
         #for p in pathogbkfi:
@@ -117,12 +121,9 @@ class IPDDatabaseCreator(object):
         #    #this may need a \n
         pathogbkfi.close()
         secdbgbkout.close()
-        #cmd="cat "+self.pathogbkfname_ +" >> ../data/annotation/secondarydb.ids.gbk"
-        #cprocess=subprocess.run(cmd, shell=True)
-        #cprocess.check_returncode()
         try:
             secdbgiter=SeqIO.parse(self.secondarygbkfname_,"genbank")
-            print("Secondary database creation completed.")
+            print("Secondary database creation started.")
             #processed secondary ids
             try:
                 for sgenrec in secdbgiter:
@@ -135,11 +136,11 @@ class IPDDatabaseCreator(object):
                 print(v)
                 pass
             print("Secondary database annotations created.")
-            secdbfafi.close()
             secdbannfi.close()
         except Exception as e:
             print(e)
             sys.exit(0)
+        secdbfafi.close()
 
     def idlist_to_localgb(self, l, fo): #Takes in the list of genbank ids
         Entrez.email="abc@xyz.com"

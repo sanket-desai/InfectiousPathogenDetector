@@ -1,9 +1,10 @@
 #!/bin/bash -i
 
 #################################################
-# Date 			: 01-09-2020 (v0_02)
+# Date 			    : 01-09-2020 (v0_02)
 # Description   : set up the tools; create primary and secondary databases; index all the databases
-# Author	    : Sonal Rashmi
+# Author	      : Sonal Rashmi
+# Updated on    : 28/09/2020 Sanket
 #################################################
 
 abort()
@@ -43,21 +44,21 @@ if [[ ! -d $home_folder/external/htslib-1.10 ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/htslib/releases/download/1.10/htslib-1.10.tar.bz2
-	tar -vxjf htslib-1.10.tar.bz2
+	tar -xf htslib-1.10.tar.bz2
 	cd htslib-1.10
 	make
 	rm $home_folder/external/htslib-1.10.tar.bz2
 	mv $home_folder/external/htslib-1.10 $home_folder/external/htslib
 	cd $home_folder
 else
-	cd $home_folder/external/htslib && make clean && cd $home_folder
+	cd $home_folder/external/htslib && make && cd $home_folder
 fi
 
 if [[ ! -d $home_folder/external/samtools-1.10 ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2
-	tar -vxjf samtools-1.10.tar.bz2
+	tar -xf samtools-1.10.tar.bz2
 	cd samtools-1.10
 	make
 	rm $home_folder/external/samtools-1.10.tar.bz2
@@ -71,7 +72,7 @@ if [[ ! -d "$home_folder/external/bcftools" ]];
 then
 	cd $home_folder/external/
 	wget https://github.com/samtools/bcftools/releases/download/1.10/bcftools-1.10.tar.bz2
-	tar -vxjf bcftools-1.10.tar.bz2
+	tar -xf bcftools-1.10.tar.bz2
 	cd bcftools-1.10
 	make
 	mv $home_folder/external/bcftools-1.10 $home_folder/external/bcftools
@@ -90,11 +91,12 @@ if [[ ! -d "$home_folder/external/freebayes" ]];
 then
 	cd $home_folder/external/
 	wget http://clavius.bc.edu/~erik/freebayes/freebayes-5d5b8ac0.tar.gz
-	tar xzvf freebayes-5d5b8ac0.tar.gz
+	tar xf freebayes-5d5b8ac0.tar.gz
 	cd freebayes
 	if [ ! -f $home_folder/external/freebayes/bin/freebayes ];
 	then
-		echo "$SUDO_PASSWWORD" | sudo -S make && echo "$SUDO_PASSWWORD" | sudo -S make;
+    make -j4
+		#echo "$SUDO_PASSWWORD" | sudo -S make && echo "$SUDO_PASSWWORD" | sudo -S make;
 	else
 		echo "Freebayes Installation Error !!!! Check the libraries."
 		abort
@@ -102,12 +104,13 @@ then
 	cd $home_folder/external/
 	git clone --recursive https://github.com/vcflib/vcflib.git
 	cd $home_folder/external/vcflib
-	echo "$SUDO_PASSWWORD" | sudo -S make -j
+	#echo "$SUDO_PASSWWORD" | sudo -S make -j
+  make -j
 	cd $home_folder/external/
 	rm -rf $home_folder/external/freebayes/vcflib
 	mv $home_folder/external/vcflib $home_folder/external/freebayes
 else
-	cd $home_folder/external/vcflib && make clean && make && cd $home_folder
+	cd $home_folder/external/vcflib && make clean && make -j && cd $home_folder
 	cd $home_folder/external/freebayes && make clean && make -j4 && cd $home_folder
 fi
 

@@ -1,9 +1,10 @@
 #!/bin/bash -i
 
 #################################################
-# Date 			: 01-09-2020 (v0_02)
-# Description   : Uninstall the tools and 
-# Author	    : Sonal Rashmi
+# Date 			    : 01-09-2020 (v0_02)
+# Description   : Uninstall the tools and
+# Author	      : Sonal Rashmi
+# Updated on    : 28/09/2020 - Sanket 
 #################################################
 
 abort()
@@ -25,33 +26,33 @@ home_folder=$(pwd)
 
 echo >&2 '
 ****************************************
-*** Deleting External Tools 		**** 
+*** Deleting External Tools 		****
 ****************************************
 '
 
 
 #samtools
 if [[ -d $home_folder/external/samtools-1.10 ]];
-then 
+then
 	rm -rf $home_folder/external/samtools-1.10
 fi
 
 #bcftools
 if [[ -d $home_folder/external/bcftools ]];
-then 
+then
 	rm -rf $home_folder/external/bcftools
 fi
 
 #htslib
 if [[ -d $home_folder/external/htslib ]];
-then 
+then
 	rm -rf $home_folder/external/htslib
 fi
 
-#freebayes 
+#freebayes
 
 if [[ -d $home_folder/external/freebayes ]];
-then 
+then
 	rm -rf $home_folder/external/freebayes*
 fi
 
@@ -66,24 +67,31 @@ fi
 # minimap2
 
 if [[ -d $home_folder/external/minimap2 ]];
-then 
+then
 	cd $home_folder/external/minimap2 && make clean && cd $home_folder
+fi
+
+# tabix
+
+if [[ -d $home_folder/external/tabix ]];
+then
+  cd $home_folder/external/tabix && make clean && cd $home_folder
 fi
 
 #lofreq
 if [[ -z $home_folder/external/lofreq_star-2.1.2/bin/lofreq ]]
-then 
+then
 	cd $home_folder/external/lofreq_star-2.1.2 && make clean cd $home_folder
 fi
 
 
 echo >&2 '
 ****************************************
-*** Deleting the ipd database 		**** 
+*** Deleting the ipd database 		****
 ****************************************
 '
 
-if [[ -f $home_folder/data/primaryref/hspathoref/hspatho.fa ]] 
+if [[ -f $home_folder/data/primaryref/hspathoref/hspatho.fa ]]
 then
 	rm $home_folder/data/primaryref/hspathoref/*
 fi
@@ -94,9 +102,9 @@ then
 fi
 
 if [[ -f $home_folder/data/secondaryref/secondary.fa ]]
-then	
+then
 	rm $home_folder/data/secondaryref/*
-fi	
+fi
 
 if [[ -f $home_folder/data/annotation/hspatho.gff ]]
 then
@@ -104,18 +112,18 @@ then
 	rm $home_folder/data/annotation/*.gbk
 	rm $home_folder/data/annotation/*.tsv
 
-fi	
+fi
 
 if [[ -d $home_folder/data/annotation/gbktemp ]]
 then
-	rm -rf $home_folder/data/annotation/gbktemp
+	rm -rf $home_folder/data/annotation/gbktemp/*
 fi
 
 
 if [[ -f $home_folder/version.info ]]
 then
 	rm $home_folder/version.info
-fi	
+fi
 
 if [[ -f $home_folder/external/snpEff/data/ipd1060/genes.gbk ]]
 then
@@ -128,6 +136,6 @@ trap : 0
 
 echo >&2 '
 ****************************************
-*** Uninstallation Successfully DONE *** 
+*** Uninstallation Successfully DONE ***
 ****************************************
 '
