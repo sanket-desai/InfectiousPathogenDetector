@@ -34,11 +34,18 @@ read -s -p "Please enter password for sudo: " SUDO_PASSWWORD
 echo
 
 #fastp
-if [[ ! -f $home_folder/external/fastp-0.20.1/fastp ]]
+if [[ ! -f $home_folder/external/fastp-0.20.1/fastp ]];
 then
 	cd $home_folder/external/fastp-0.20.1 && make clean && make && cd $home_folder
 fi
 #samtools
+
+if [[ ! -f $home_folder/external/tabix/tabix  ]];
+then
+  cd $home_folder/external
+  git clone --recursive https://github.com/samtools/tabix.git
+  cd tabix && make && cd $home_folder
+fi
 
 if [[ ! -d $home_folder/external/htslib-1.10 ]];
 then
