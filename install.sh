@@ -167,4 +167,6 @@ then
 	cd $home_folder/external/lofreq_star-2.1.2 && ./bootstrap && ./configure && make clean && make && make install && cd $home_folder
 fi
 
-#bash databasesetup.sh
+shell_name=$(echo $0)
+
+#$shell_name databasesetup.sh
