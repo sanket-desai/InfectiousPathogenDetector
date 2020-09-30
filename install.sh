@@ -91,15 +91,15 @@ fi
 
 # bamtools for freebayes
 
-cd $home_folder/external/
-rm -rf bamtools
-git clone git://github.com/pezmaster31/bamtools.git
-cd bamtools
-mkdir build
-cd build
-cmake ../
-make
-cd $home_folder
+#cd $home_folder/external/
+#rm -rf bamtools
+#git clone git://github.com/pezmaster31/bamtools.git
+#cd bamtools
+#mkdir build
+#cd build
+#cmake ../
+#make
+#cd $home_folder
 #freebayes (freebayes requires g++, camke, the standard C and C++ development libraries, liblzma, pthread, and libbzip2.)
 
 rm -rf $home_folder/external/freebayes
@@ -108,11 +108,6 @@ cd freebayes && make
 
 if [[ ! -f "$home_folder/external/freebayes/bin/freebayes" ]];
 then
-	echo "Freebayes installed successfully!!"
-else
-	echo "Freebayes Installation Error !!!! Check the libraries."
-	abort
-fi
 	cd $home_folder/external/
 	git clone --recursive https://github.com/vcflib/vcflib.git
 	cd $home_folder/external/vcflib
@@ -121,9 +116,11 @@ fi
 	cd $home_folder/external/
 	rm -rf $home_folder/external/freebayes/vcflib
 	mv $home_folder/external/vcflib $home_folder/external/freebayes
+  cd freebayes && make
+  echo "Freebayes installed successfully!!"
 else
-	cd $home_folder/external/vcflib && make clean && make -j && cd $home_folder
-	cd $home_folder/external/freebayes && make clean && make -j4 && cd $home_folder
+	echo "Freebayes Installation Error !!!! Check the libraries."
+	abort
 fi
 
 # minimap2
@@ -168,4 +165,4 @@ fi
 
 shell_name=$(echo $0)
 
-#$shell_name databasesetup.sh
+$shell_name databasesetup.sh
