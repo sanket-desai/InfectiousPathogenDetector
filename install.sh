@@ -123,7 +123,7 @@ fi
 
 # minimap2
 
-if [[ ! -f "$home_folder/external/minimap2" ]];
+if [[ ! -f "$home_folder/external/minimap2/minimap2" ]];
 then
 	cd $home_folder/external/minimap2 && make clean && make && cd $home_folder
 fi
@@ -137,9 +137,6 @@ then
 	echo "Install Conda!!!!!!!!!!!!!"
 	abort
 elif [[ -z $medaka_env ]];
-then
-   source activate medaka
-else
 	conda create -n medaka -c conda-forge -c bioconda medaka
 fi
 
@@ -151,7 +148,7 @@ then
 	echo "pip3 not found in path"
 	abort
 else
-	pip3 install nanofilt
+	sudo pip3 install nanofilt
 fi
 
 #lofreq
