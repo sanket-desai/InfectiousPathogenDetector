@@ -108,19 +108,17 @@ cd freebayes && make
 
 if [[ ! -f "$home_folder/external/freebayes/bin/freebayes" ]];
 then
-	cd $home_folder/external/
-	git clone --recursive https://github.com/vcflib/vcflib.git
-	cd $home_folder/external/vcflib
+	#cd $home_folder/external/
+	#git clone --recursive https://github.com/vcflib/vcflib.git
+	#cd $home_folder/external/vcflib
 	#echo "$SUDO_PASSWWORD" | sudo -S make -j
-  make -j
-	cd $home_folder/external/
-	rm -rf $home_folder/external/freebayes/vcflib
-	mv $home_folder/external/vcflib $home_folder/external/freebayes
-  cd freebayes && make
-  echo "Freebayes installed successfully!!"
-else
-	echo "Freebayes Installation Error !!!! Check the libraries."
-	abort
+  #make -j
+	#cd $home_folder/external/
+	#rm -rf $home_folder/external/freebayes/vcflib
+	#mv $home_folder/external/vcflib $home_folder/external/freebayes
+  #cd freebayes && make
+  echo "Freebayes installation failed!!"
+  abort
 fi
 
 # minimap2
