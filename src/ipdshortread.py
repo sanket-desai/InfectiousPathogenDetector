@@ -185,9 +185,6 @@ class IPDShortRead(object):
 		print("Data loaded, going for primary alignment!")
 		#Param testing
 		self.primary_alignment()
-		if self.inputmap_['datatype']=='dna':
-			self.dna_preprocessing()
-			#dna_preprocessing adds _dna to the primary sam file name
 		print("Primary alignment completed..")
 		#sam file to be given for featurecounts - counting sam
 		self.primarycountsam_=self.primarysam_.replace(".sam", "_count.bam")
@@ -208,6 +205,9 @@ class IPDShortRead(object):
 		self.assembledcontigdirectory_=self.primarysam_.replace(".sam","_assembledcontigs")
 		self.assembledcontigsfinalfile_=self.assembledcontigdirectory_+"/final.contigs.fa"
 		self.assembledcontigsblastoutput_=self.primarysam_.replace(".sam", "_assembledcontigs_blastout.tsv")
+		if self.inputmap_['datatype']=='dna':
+			self.dna_preprocessing()
+			#dna_preprocessing adds _dna to the primary sam file name
 		#primary alignment sam file / file reader
 		self.primarysamfilehandle_=pysam.AlignmentFile(self.primarysam_,'r')
 		self.primarycountsamfilehandle_=pysam.AlignmentFile(self.primarycountsam_, 'wb', template=self.primarysamfilehandle_)
@@ -270,7 +270,6 @@ class IPDShortRead(object):
 		except subprocess.CalledProcessError:
 			print("Variant preprocessing failed. PICARD error!!")
 			sys.exit(0)
-
 		try:
 			self.variantcalling()
 		except subprocess.CalledProcessError:
@@ -428,7 +427,7 @@ class IPDShortRead(object):
 							self.assemblyfastqinput2filehandle_.write("+\n")
 							self.assemblyfastqinput2filehandle_.write("%s\n" %(s2.qqual) )
 						#else:
-						if not s1.is_unmapped or s2.is_unmapped:
+						if not s1.is_unmapped or not s2.is_unmapped: #Changed s2 status to be aligned
 							if self.primarymetadata_.is_human(s1.reference_name) and self.primarymetadata_.is_human(s2.reference_name): #Human fragment
 								self.primarycountsamfilehandle_.write(s1)
 								self.primarycountsamfilehandle_.write(s2)
