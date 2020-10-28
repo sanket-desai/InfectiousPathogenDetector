@@ -130,16 +130,23 @@ fi
 
 #medaka (conda)
 
-conda_env=$(conda info | grep -i 'base environment')
-medaka_env=$(conda info --envs | grep "medaka")
-if [[ -z $conda_env ]];
-then
-	echo "Install Conda!!!!!!!!!!!!!"
-	abort
-elif [[ -z $medaka_env ]];
-	conda create -n medaka -c conda-forge -c bioconda medaka
-fi
+#conda_env=$(conda info | grep -i 'base environment')
+#medaka_env=$(conda info --envs | grep "medaka")
+#if [[ -z $conda_env ]];
+#then
+#	echo "Install Conda!!!!!!!!!!!!!"
+#	abort
+#elif [[ -z $medaka_env ]];
+#	conda create -n medaka -c conda-forge -c bioconda medaka
+#fi
 
+conda_exe=$(which conda)
+if [[ -x $conda_exe ]];
+then
+  	conda create -n medaka -c conda-forge -c bioconda medaka
+else;
+  echo "Install Anaconda/ Conda package manager and add to path!"
+  abort
 #nanofile
 
 pip_version=$(which pip3)
