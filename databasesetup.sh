@@ -12,7 +12,7 @@ echo >&2 '
 *** Download the databases 		******
 **************************************
 '
-
+home_folder=$(pwd)
 
 mkdir -p $home_folder/data/{annotation,cov2moduleref,primaryref/{hspathoref,pathoref},secondaryref}
 

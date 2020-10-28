@@ -18,10 +18,6 @@ abort()
     exit 1
 }
 
-trap 'abort' 0
-
-set -e
-
 home_folder=$(pwd)
 
 echo >&2 '
@@ -151,12 +147,12 @@ else;
 #nanofile
 
 pip_version=$(which pip3)
-if [[ -z "$pip_version" ]]
+if [[ -x "$pip_version" ]]
 then
-	echo "pip3 not found in path"
-	abort
+  pip3 install nanofilt
 else
-	sudo pip3 install nanofilt
+  echo "pip3 not found in path"
+	abort
 fi
 
 #lofreq
@@ -166,6 +162,6 @@ then
 	cd $home_folder/external/lofreq_star-2.1.2 && ./bootstrap && ./configure && make clean && make && make install && cd $home_folder
 fi
 
-shell_name=$(echo $0)
+shell_name=$(echo $SHELL)
 
 $shell_name databasesetup.sh
