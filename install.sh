@@ -4,7 +4,7 @@
 # Date 			    : 01-09-2020 (v0_02)
 # Description   : set up the tools; create primary and secondary databases; index all the databases
 # Author	      : Sonal Rashmi
-# Updated on    : 28/09/2020 Sanket
+# Updated on    : 30/10/2020 Sanket
 #################################################
 
 abort()
