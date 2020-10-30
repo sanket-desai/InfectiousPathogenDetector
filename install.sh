@@ -137,6 +137,14 @@ fi
 #	conda create -n medaka -c conda-forge -c bioconda medaka
 #fi
 
+#Install porechop
+rm -rf $home_folder/external/Porechop
+cd $home_folder/external
+git clone https://github.com/rrwick/Porechop.git
+cd Porechop
+make
+cd $home_folder
+
 conda_exe=$(which conda)
 if [[ -x $conda_exe ]];
 then
