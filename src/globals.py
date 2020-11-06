@@ -63,7 +63,7 @@ class GlobalVar(object):
 
 	##cov2 module
 	hspathofa_="../data/primaryref/hspathoref/hspatho.fa"
-	vcfdatabasefile_="../data/cov2moduleref/gisaidmerged.vcf"
+	vcfdatabasefile_="../data/cov2moduleref/gisaidmerged.vcf.gz"
 	gisaidmetadatafile_="../data/cov2moduleref/gisaidmetadata.tsv"
 	covblastndb_="../data/cov2moduleref/gisaid.fasta"
 
@@ -76,8 +76,8 @@ class GlobalVar(object):
 			raise GlobalVarException("BlastN not found in the defined path: %s" % GlobalVar.blastn_ )
 		if not os.path.isfile(GlobalVar.samtools_):
 			raise GlobalVarException("Samtools not found in the defined path: %s" % GlobalVar.samtools_ )
-		if not os.path.isfile(GlobalVar.megahit_):
-			raise GlobalVarException("MegaHit not found in the defined path: %s" % GlobalVar.megahit_ )
+		#if not os.path.isfile(GlobalVar.megahit_):
+		#	raise GlobalVarException("MegaHit not found in the defined path: %s" % GlobalVar.megahit_ )
 		#if not os.path.isfile(GlobalVar.subjunc_):
 		 #   raise GlobalVarException("Subjunc not found in the defined path: %s" % GlobalVar.subjunc_ )
 		#if not os.path.isfile(GlobalVar.subreadalign_):

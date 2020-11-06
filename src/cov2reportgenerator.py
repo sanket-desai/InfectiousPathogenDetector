@@ -4,7 +4,7 @@
 Author	  : Sonal Rashmi
 Date		: 17/07/2020
 Description : It takes the IPD directory post successful completion of IPD run, generates a html report with Basic Alignment stats(using picard), Coverage of SARS-CoV2(using samtools), abundance plots (Overall and SARS-CoV2), Novel variant and Clade assessment
-
+version : 2
 '''
 
 import os
@@ -39,85 +39,108 @@ class CoV2ReportGenerator(object):
 			self.coverage_map={}
 			self.summaryout_map={}
 			self.contig_map={}
+			self.cov2outdir=os.path.join(self.outdir, "cov2output")
+			if not os.path.exists(self.cov2outdir):
+				os.mkdir(self.cov2outdir)
 			for file in os.listdir(self.outdir):
 				if file.endswith("_count.bam"):					
 					bam=os.path.join(self.outdir, file)
-					#print(bam)
-					#sort bam
-					sortedbam=bam.replace(".bam","_sorted.bam")
-					cmd=GlobalVar.picard_+" SortSam INPUT="+ bam +" OUTPUT="+sortedbam+" SORT_ORDER=coordinate VALIDATION_STRINGENCY=SILENT TMP_DIR="+os.path.join(self.outdir, "tmp")
-					#print(cmd)
-					cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-					cprocess.check_returncode()
-					
-					#bam indexing
-					cmd=GlobalVar.picard_+" BuildBamIndex INPUT="+ sortedbam +" OUTPUT="+sortedbam+".bai VALIDATION_STRINGENCY=SILENT  TMP_DIR="+os.path.join(self.outdir, "tmp")
-					#print(cmd)
-					cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-					cprocess.check_returncode()
-					
-					#picard summary
-					summaryout=sortedbam.replace("_count_sorted.bam","_summary.tsv")
-					cmd=GlobalVar.picard_+" CollectAlignmentSummaryMetrics R="+ GlobalVar.hspathofa_ +" I="+ sortedbam +" O="+summaryout 
-					#print(cmd)
-					cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-					cprocess.check_returncode()
-					
-					#samtools depth
-					coverage=sortedbam.replace("_count_sorted.bam","_coverage.tsv")
-					cmd=GlobalVar.samtools_+" depth -r NC_045512.2:1-29903 -a "+ sortedbam + " -o "+coverage 
-					#print(cmd)
-					cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
-					cprocess.check_returncode()
-					
 					bam_sample=os.path.basename(bam)
 					sample=bam.replace("_count.bam","")
-					
-					self.coverage_map[sample]=coverage
-					self.summaryout_map[sample]=summaryout
-					#print(self.coverage_map)
-				
+					summary_file_out=self.bam_summary_generation(bam)
+					if summary_file_out:
+						self.summaryout_map[sample]=summary_file_out
+					coverage_file_out=self.bam_coverage(bam)
+					if coverage_file_out:
+						self.coverage_map[sample]=coverage_file_out
+							
 				if file.endswith("_finalcounts.tsv"):						
 					countfile=os.path.join(self.outdir, file)
 					countfile_sample=os.path.basename(countfile)
 					sample=countfile_sample.replace("_finalcounts.tsv","")
 					self.countfile_map[sample]=countfile
-				
-				if file.endswith("_final_annotated.vcf"):					
-					vcf=os.path.join(self.outdir, file)
-					vcf_sample=os.path.basename(vcf)
-					sample=vcf_sample.replace("_final_annotated.vcf","")
-					self.vcf_map[sample]=vcf
-					self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
-					prefix = vcf.replace("_final_annotated.vcf","")
-					contig_file=os.path.join(prefix+"_assembledcontigs","final.contigs.fa")
-					self.contig_map[sample]=contig_file
-				
+					
 				if file.endswith("_featurecounts.tsv.summary"):	
 					featurecountsummary=os.path.join(self.outdir, file)
 					data=pd.read_csv(featurecountsummary,sep="\t",index_col = "Status")
 					data_t=pd.DataFrame.transpose(data)
 					total=data_t['Assigned'].to_list()[0]
 					self.total_fragment_list.append(total)
-						
-			#print(self.total_fragment_list)	
-	
+					#print(self.total_fragment_list)
+					
+				if file.endswith("_final_annotated.vcf"):					
+					vcf=os.path.join(self.outdir, file)
+					vcf_sample=os.path.basename(vcf)
+					sample=vcf_sample.replace("_final_annotated.vcf","")
+					self.vcf_map[sample]=vcf
+			try:
+				self.clade_assessment_obj=GisaidVcfAnnotator(self.vcf_map)
+			except:
+				print("Clade assessment Object not created. Error!!")
+			#print(self.vcf_map)	
+					
+	def bam_summary_generation(self, bam=None):
+		summary_file=None
+		if bam:
+			if os.path.isfile(bam):
+				#sort bam
+				sortedbam=bam.replace(".bam","_sorted.bam")
+				cmd=GlobalVar.picard_+" SortSam INPUT="+ bam +" OUTPUT="+sortedbam+" SORT_ORDER=coordinate VALIDATION_STRINGENCY=SILENT TMP_DIR="+os.path.join(self.outdir, "tmp")
+				cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+				cprocess.check_returncode()
+					
+				#bam indexing
+				cmd=GlobalVar.picard_+" BuildBamIndex INPUT="+ sortedbam +" OUTPUT="+sortedbam+".bai VALIDATION_STRINGENCY=SILENT  TMP_DIR="+os.path.join(self.outdir, "tmp")
+				cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+				cprocess.check_returncode()
+					
+				#picard summary
+				summaryout=sortedbam.replace("_count_sorted.bam","_summary.tsv")
+				cmd=GlobalVar.picard_+" CollectAlignmentSummaryMetrics R="+ GlobalVar.hspathofa_ +" I="+ sortedbam +" O="+summaryout 
+				cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+				cprocess.check_returncode()
+				
+		if os.path.isfile(summaryout):
+			summary_file=summaryout
+		else:
+			print("Error in generating summary file "+bam)
+		return summary_file	
+			
+	def bam_coverage(self, bam=None):
+		coverage_out=None
+		if bam:
+			if os.path.isfile(bam):
+				#samtools depth
+				sortedbam=bam.replace(".bam","_sorted.bam")
+				coverage=sortedbam.replace("_count_sorted.bam","_coverage.tsv")
+				cmd=GlobalVar.samtools_+" depth -r NC_045512.2:1-29903 -a "+ sortedbam + " -o "+coverage 
+				cprocess=subprocess.run(cmd, shell=True, stdout=subprocess.DEVNULL)
+				cprocess.check_returncode()
+		if os.path.isfile(coverage):
+			coverage_out=coverage
+		else:
+			print("Error in generating coverage for "+bam)
+		return coverage_out
+
 	def basic_stats_tabulation_for_file(self,file_name,sample):
-		data=open(file_name,'r')
-		Pandasobj=pd.read_csv(file_name,skiprows=5,sep="\t",engine='python',header=1)
-		PandasDf=pd.DataFrame(data=Pandasobj)
-		col = ['TOTAL_READS','PF_READS_ALIGNED','PCT_PF_READS_ALIGNED','MEAN_READ_LENGTH']
-		if PandasDf["CATEGORY"].shape[0] == 3:  
-			PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "FIRST_OF_PAIR"]
-			PandasDf=PandasDf.rename(index={2:0})
-		elif PandasDf['CATEGORY'].shape[0] == 1:
-			PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "UNPAIRED"]
-		df = pd.DataFrame(PandasDf, columns=col)
-		df['Percent_Aligned_Reads']=df['PCT_PF_READS_ALIGNED']*100
-		df=df.drop(['PCT_PF_READS_ALIGNED'],axis=1)
-		df=df.rename(columns={"TOTAL_READS":"Total_Reads","PF_READS_ALIGNED":"Aligned_Reads","Percent_Aligned_Reads":"Percent_Aligned_Reads","MEAN_READ_LENGTH":"Mean_Read_Length"})
-		df=df[["Total_Reads","Aligned_Reads","Percent_Aligned_Reads","Mean_Read_Length"]]
-		df_t = pd.DataFrame.transpose(df).rename(columns={0:sample})
+		if os.path.isfile(file_name):
+			sample=os.path.basename(sample)
+			#Minor change, addition of base name instead of complete path (Nov,5 2020, sanket)
+			data=open(file_name,'r')
+			Pandasobj=pd.read_csv(file_name,skiprows=5,sep="\t",engine='python',header=1)
+			PandasDf=pd.DataFrame(data=Pandasobj)
+			col = ['TOTAL_READS','PF_READS_ALIGNED','PCT_PF_READS_ALIGNED','MEAN_READ_LENGTH']
+			if PandasDf["CATEGORY"].shape[0] == 3:  
+				PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "FIRST_OF_PAIR"]
+				PandasDf=PandasDf.rename(index={2:0})
+			elif PandasDf['CATEGORY'].shape[0] == 1:
+				PandasDf=PandasDf.loc[PandasDf["CATEGORY"] == "UNPAIRED"]
+			df = pd.DataFrame(PandasDf, columns=col)
+			df['Percent_Aligned_Reads']=df['PCT_PF_READS_ALIGNED']*100
+			df=df.drop(['PCT_PF_READS_ALIGNED'],axis=1)
+			df=df.rename(columns={"TOTAL_READS":"Total_Reads","PF_READS_ALIGNED":"Aligned_Reads","Percent_Aligned_Reads":"Percent_Aligned_Reads","MEAN_READ_LENGTH":"Mean_Read_Length"})
+			df=df[["Total_Reads","Aligned_Reads","Percent_Aligned_Reads","Mean_Read_Length"]]
+			df_t = pd.DataFrame.transpose(df).rename(columns={0:sample})
 		return df_t
 		
 	def get_basic_stats_tabulation_for_the_batch(self):
@@ -125,42 +148,50 @@ class CoV2ReportGenerator(object):
 		all_sample_df = pd.DataFrame()
 		cnt=0
 		for sample in self.summaryout_map:
-			file=self.summaryout_map[sample]
-			data=open(file,'r')
-			temp_df=self.basic_stats_tabulation_for_file(file,sample)
-			if cnt == 0:
-				all_sample_df = temp_df
-			else:
-				all_sample_df = all_sample_df.merge(temp_df, left_index=True, right_index=True)
-			cnt=cnt+1	
-		all_sample_df.to_csv(os.path.join(self.outdir,"Basic_stats_summary.csv"))
-		output_file=os.path.join(self.outdir,"Basic_stats_summary.csv")
-		#print(all_sample_df)
+			if self.summaryout_map[sample]:
+				file=self.summaryout_map[sample]
+				data=open(file,'r')
+				temp_df=self.basic_stats_tabulation_for_file(file,sample)
+				if cnt == 0:
+					all_sample_df = temp_df
+				else:
+					all_sample_df = all_sample_df.merge(temp_df, left_index=True, right_index=True)
+				cnt=cnt+1	
+		output_file=os.path.join(self.cov2outdir,"Basic_stats_summary.csv")
+		all_sample_df.to_csv(output_file)
+		if os.path.isfile(output_file):
+			print("Basic Stats summary tabulation generated!")
+		else:
+			print("Error in basic Stats summary output generation.")
 		return output_file
 		
 	def get_coverage_plot(self):	
 		image_file_list=[]
+		coverage_out=None
+		coverage_out=open(os.path.join(self.cov2outdir,"cov2_coverage_compilation.csv"),'a+',encoding='UTF-8')
 		for sample in self.coverage_map:
-			x = []
-			y = []
-			table = pd.read_csv(self.coverage_map[sample] , sep='\t',header=None)
-			alignment = pd.DataFrame(data=table)
-			x=alignment[1]
-			y=alignment[2]
-			axes = plt.gca()
-			axes.set_ylim([0,500])
+			if self.coverage_map[sample]:
+				x = []
+				y = []
+				table = pd.read_csv(self.coverage_map[sample] , sep='\t',header=None)
+				alignment = pd.DataFrame(data=table)
+				x=alignment[1]
+				y=alignment[2]
+				axes = plt.gca()
+				axes.set_ylim([0,500])
 
-			median=np.median(y)
-			title_var=sample+" (Median Coverage = "+str(median)+" )"
-			plt.plot(x,y,color="grey")
-			plt.xlabel('Position in SARS CoV2 Genome')
-			plt.ylabel('Depth of Coverage')
-			plt.title(title_var, loc='center')
-			plt.savefig(os.path.join(self.outdir,sample+"_coverage.png"))
-			plt.close(fig=None)
-			image_file_list.append(os.path.join(self.outdir,sample+"_coverage.png"))
-			coverage_out=open(os.path.join(self.outdir,"cov2_coverage_compilation.csv"),'a+',encoding='UTF-8')
-			print(str(sample)+"\t"+str(median),file=coverage_out)
+				median=np.median(y)
+				#base name obtained - change Nov 5,2020 - Sanket
+				title_var= os.path.basename(sample)+" (Median Coverage = "+str(median)+" )"
+				plt.plot(x,y,color="grey")
+				plt.xlabel('Position in SARS CoV2 Genome')
+				plt.ylabel('Depth of Coverage')
+				plt.title(title_var, loc='center')
+				plt.savefig(os.path.join(self.outdir,sample+"_coverage.png"))
+				plt.close(fig=None)
+				image_file_list.append(os.path.join(self.cov2outdir,sample+"_coverage.png"))
+				print(str(sample)+"\t"+str(median),file=coverage_out)
+		print("Coverage output generated!!!")
 		return image_file_list
 
 	def get_abundance_plot(self):
@@ -171,7 +202,7 @@ class CoV2ReportGenerator(object):
 		pathogen_all=[]
 		sample_list=[]
 		image_file_list=[]
-		cov2_fpkm_out=open(os.path.join(self.outdir,"cov2_fpkm_compilation.csv"),'a+',encoding='UTF-8')
+		cov2_fpkm_out=open(os.path.join(self.cov2outdir,"cov2_fpkm_compilation.csv"),'a+',encoding='UTF-8')
 		for sample in self.countfile_map:
 			file=self.countfile_map[sample]
 			data=open(file,'r')
@@ -186,6 +217,8 @@ class CoV2ReportGenerator(object):
 			pathogen_all.append(round(pathogen_df['Fragments'].sum(),2))
 			sample_list.append(sample)
 			print(str(sample)+"\t"+str(round(CoV2_df["FPKM"],2).to_string(index=False)),file=cov2_fpkm_out)
+		
+		print("Abundance Summary generated!")
 		
 		CoV2=list(map(float, CoV2))
 		CoV2_fpkm=list(map(float, CoV2_fpkm))
@@ -205,15 +238,18 @@ class CoV2ReportGenerator(object):
 		log2FPKM=CoV2_fpkm_log2
 		#print(sample,log2FPKM)
 		sample_pos = [i for i, _ in enumerate(sample)]
+		fpkm_plot_file=os.path.join(self.cov2outdir,'CoV2_FPKM.png')
 		plt.bar(sample_pos, log2FPKM, color='red', width=10)
 		plt.xlabel('')
 		plt.ylabel('CoV2 log2 FPKM')
-		plt.title("Samples CoV2 FPKM")
+		plt.title("SARS-CoV-2 quantification (FPKM)")
 		plt.xticks(sample_pos, sample, rotation=30)
-		plt.savefig(os.path.join(self.outdir,'CoV2_FPKM.png'), bbox_inches = 'tight', pad_inches = 0)
+		plt.savefig(fpkm_plot_file, bbox_inches = 'tight', pad_inches = 0)
 		plt.close(fig=None)
-		#Plot Stack bar plot
 		
+		print("FPKM plot is generated")
+		
+		#Plot Stack bar plot
 		Sample = sample_list
 		CoV2= np.array([(x/y)*100 for x, y in zip(map(float, CoV2), map(int, Total))])
 		Human= np.array([(x/y)*100 for x, y in zip(map(float, human), map(int, Total))])
@@ -230,14 +266,18 @@ class CoV2ReportGenerator(object):
 		plt.bar(ind, Pathogen, width=0.8, label='Pathogen', color='yellow', bottom=CoV2)
 		plt.bar(ind, CoV2, width=0.8, label='CoV2', color='red')
 
+		stack_plot_file=os.path.join(self.cov2outdir,'Samples_stackbar.png')
 		plt.xticks(ind, Sample, rotation = 10)
 		plt.ylabel("Relative Composition")
 		plt.xlabel("")
 		plt.legend(loc="upper right")
 		plt.title("Sample Composition")
-		plt.savefig(os.path.join(self.outdir,'Samples_stackbar.png'))
+		plt.savefig(stack_plot_file)
 		plt.close(fig=None)
-		image_file_list=[os.path.join(self.outdir,'CoV2_FPKM.png'),os.path.join(self.outdir,'Samples_stackbar.png')]
+		
+		print("Abundance stack plot is generated!")
+		
+		image_file_list=[fpkm_plot_file,stack_plot_file]
 		return image_file_list
 		
 	def get_clade_assessment(self):
@@ -246,7 +286,9 @@ class CoV2ReportGenerator(object):
 			clade_df=self.clade_assessment_obj.get_pandas_df_clade_assessment()
 		except:
 			print("Error in Clade Assessment")
-		clade_df.to_csv(os.path.join(self.outdir,"Variant_based_clade_assessment.csv"))	
+		cov2_clade_out=os.path.join(self.cov2outdir,"Variant_based_clade_assessment.csv")	
+		clade_df.to_csv(cov2_clade_out)	
+		
 		return clade_df
 		
 	def get_novel_variant(self):
@@ -255,30 +297,11 @@ class CoV2ReportGenerator(object):
 			novel_var_df=self.clade_assessment_obj.get_pandas_df_novel_variant()
 		except:
 			print("Error in Novel Variant")
-		novel_var_df.to_csv(os.path.join(self.outdir,"Novel_variant.csv"))
+		novel_var_out=os.path.join(self.cov2outdir,"Novel_variant.csv")	
+		novel_var_df.to_csv(novel_var_out)
+		
 		return novel_var_df
 		
-	def get_contig_based_clades(self):
-		contig_out=open(os.path.join(self.outdir,"contig_based_clade_out.csv"),'a+',encoding='UTF-8')
-		GisaidMetadataParserObj=GisaidMetadataParser(GlobalVar.gisaidmetadatafile_)
-		print("Sample"+"\t"+"Contig_id"+"\t"+"gisaid"+"\t"+"gisaid_clade"+"\t"+"pangolin_lineage",file=contig_out)
-		data=[]
-		for sample in self.contig_map:
-			assembledcontigsblastoutput=os.path.join(self.outdir,sample+"_cov2_blast_out.tsv")
-			blastouthandle=LocalBlastN(GlobalVar.blastn_, GlobalVar.covblastndb_, self.contig_map[sample], 1, 4, assembledcontigsblastoutput, "6" )
-			f = open(assembledcontigsblastoutput, "r")
-			for line in f:
-				qseqid=line.split('\t')[0]
-				if qseqid:
-					if 'EPI_ISL' in line.split('\t')[1]: 
-						gisaid_id=line.split('|')[1]
-						gisaid_clade=GisaidMetadataParserObj.get_gisaid_clade_for_gisaid_id(gisaid_id)
-						pangolin_lineage=GisaidMetadataParserObj.get_pangolin_lineage_for_gisaid_id(gisaid_id)
-						record=[str(sample),str(qseqid),str(gisaid_id),str(gisaid_clade),str(pangolin_lineage)]
-						print('\t'.join(map(str,record)),file=contig_out)
-						data.append(record)
-		#print(data)	
-		return data		
 		
 '''
 input: output directory of IPD post successful run
@@ -300,8 +323,8 @@ def main():
 		ab_plot_list=obj.get_abundance_plot()
 		clade_df=obj.get_clade_assessment()
 		novel_variant_df=obj.get_novel_variant()
-		#contig_clades=obj.get_contig_based_clades()
-		output_file = open(os.path.join(outdir,"Output.html"), "w", encoding="utf-8", errors="xmlcharrefreplace")
+		cov2outdir=os.path.join(outdir, "cov2output")
+		output_file = open(os.path.join(cov2outdir,"Output.html"), "w", encoding="utf-8", errors="xmlcharrefreplace")
 
 		header=markdown("#**IPD REPORT**")
 		output_file.write(header)
@@ -353,7 +376,11 @@ def main():
 		else:
 			html3 = markdown("No Intersecting Variants Found. Clade Can't be determined !!!!")
 		output_file.write(html3)
-		
+		output_file.close()
+		#HTML to PDF report
+		import pdfkit 
+		pdfkit.from_file(os.path.join(cov2outdir,"Output.html"), os.path.join(cov2outdir,"OutputReport.pdf"))
 if __name__ =="__main__":
 		main()			
+		
 		
