@@ -21,15 +21,16 @@ With the following system prerequisites in place, users can use the following co
 
 **Python Packages:**
 
-  - [Pysam](https://pypi.org/project/pysam/): pip install pysam
+  - [Pysam](https://pypi.org/project/pysam/): pip3 install pysam
   - [Tkinter](For only GUI: https://tkdocs.com/tutorial/install.html)
 
 **Packages Required for automated report generation:**
 
-  - [Numpy](https://pypi.org/project/numpy/) : pip install numpy
-  - [Matplotlib](https://pypi.org/project/matplotlib/): pip install matplotlib
-  - [Pandas](https://pypi.org/project/pandas/): pip install pandas
-  - [SciPy](https://pypi.org/project/scipy/): pip install scipy
+  - [Numpy](https://pypi.org/project/numpy/) : pip3 install numpy
+  - [Matplotlib](https://pypi.org/project/matplotlib/): pip3 install matplotlib
+  - [Pandas](https://pypi.org/project/pandas/): pip3 install pandas
+  - [SciPy](https://pypi.org/project/scipy/): pip3 install scipy
+  - [pdfkit](https://pypi.org/project/pdfkit/): pip3 install pdfkit
 
 ### Installation
 
