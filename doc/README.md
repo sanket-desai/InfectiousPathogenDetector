@@ -1,25 +1,28 @@
 # IPD (Infection Pathogen Detector)
 
-IPD is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogenous NGS platforms. IPD performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and an automated report generation.
+IPD is an in-silico GUI-based automated pathogen analysis pipeline for seamless analysis of data from heterogeneous NGS platforms. IPD performs integrated variants analysis, along with systematic quantification of pathogen genomes. IPD additionally has an in-built SARS-CoV-2 analysis module, for assignment of viral clades of the samples analyzed and to generate an automated report.
 
 ## Getting Started
 
 ### Prerequisites required for installation of IPD
 
-There are two automated interfaces for the tool either of them can be used by the user. It is developed using python3. 
+There are two automated interfaces for the tool either of them can be used by the user. It is developed using python3.
 
 **System Prerequisites:**
 
   - [Pip3](https://pip.pypa.io/en/stable/installing/)
   - [Python3](https://realpython.com/installing-python/)
   - [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
+  - [Make](https://www.gnu.org/software/make/)
+  - [CMAKE](https://cmake.org/install/)
+  - [Java](https://java.com/en/download/)
 
 With the following system prerequisites in place, users can use the following commands in the Linux / Unix environment to install the required python packages.
 
 **Python Packages:**
 
   - [Pysam](https://pypi.org/project/pysam/): pip install pysam
-  - [Tkinter](For only GUI: https://tkdocs.com/tutorial/install.html) 
+  - [Tkinter](For only GUI: https://tkdocs.com/tutorial/install.html)
 
 **Packages Required for automated report generation:**
 
@@ -70,7 +73,7 @@ $ python3 ipd_cli.py
 **For GUI: ** (Usage of IPD GUI is elaborated in further section of the manual)
 
 ```
-$ python3 ipd_gui.py 
+$ python3 ipd_gui.py
 ```
 
 ### Guide to use command-line interface of IPD
@@ -80,12 +83,12 @@ Scripts are present in the src folder. src should be used as the execution direc
 **Command:**
 
 ```
-$ python3 IPD_cli.py {long, short}
+$ python3 ipd_cli.py {long, short}
 ```
 
 ![cli](cli_screenshot.png)
 
-Single-end long read data is taken as an input. Prefix is set as the project name which is used as the prefix for all the output files. 
+Single-end long read data is taken as an input. Prefix is set as the project name which is used as the prefix for all the output files.
 
 **Command:**
 
@@ -110,7 +113,7 @@ $ python3 ipd_cli.py short -p <project name> -t <number of threads default 4> -o
 IPD graphical user interface is developed for the analysis of both long and short read to detect the abundance of pathogen and variants present in them. GUI code is kept in src, following command is used to access the same.
 
 ```
-$python3 ipd_gui.py 
+$python3 ipd_gui.py
 ```
 
 ![gui_basic](gui_basic.png)
@@ -153,10 +156,10 @@ Sample HTML Report is attached below.
 
 It has four Sections:
 
-1.	Basic Alignment Statistical summary: It includes total reads, aligned reads and read length of each sample in the project. 
+1.	Basic Alignment Statistical summary: It includes total reads, aligned reads and read length of each sample in the project.
 2.	Per Base Coverage for SARS-CoV2: The read depth of each base of SARS-CoV2 genome is calculated and log2 of the reads is taken and sample-wise plots are generated
 3.	Relative Abundance: Stack-bar plot illustrates the relative abundance of Human, Pathogen, SARS-CoV2 and unaligned reads for each sample. The FPKM values of SARS-CoV2 are plotted in the adjacent bar plot.
-4.	Novel SARS-CoV2 Variants: Annotated variants not present in the IPD SARS-CoV2 vcf-database used are tabulated. 
+4.	Novel SARS-CoV2 Variants: Annotated variants not present in the IPD SARS-CoV2 vcf-database used are tabulated.
 5.	Variant Based SARS-CoV2 Clade Assignment: Based on the mutational profile of the sample’s clade assessment is done and tabulated in the last section of the report.
 
 Apart from the HTML SARS-CoV2 report, IPD generates other tabulated output which are as follow:
@@ -166,44 +169,3 @@ Apart from the HTML SARS-CoV2 report, IPD generates other tabulated output which
 3.	Sample_assembledcontigs/ final.contigs.fa: It contains the assembled Contigs
 
 ![ipd_report](ipd_report.png)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
