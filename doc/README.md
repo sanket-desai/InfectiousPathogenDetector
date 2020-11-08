@@ -79,7 +79,7 @@ $ python3 ipd_gui.py
 
 ### Guide to use command-line interface of IPD
 
-Scripts are present in the src folder. src should be used as the execution directory, output directory will be used as the working directory. The screenshot below explains the options available in the interface and its usage. There are two modes in the IPD command-line interface based on the sequencing type selected (long read sequencing and short read sequencing)
+Scripts are present in the src folder. src should be used as the execution directory, output directory will be used as the working directory. The screen-shot below explains the options available in the interface and its usage. There are two modes in the IPD command-line interface based on the sequencing type selected (long read sequencing and short read sequencing)
 
 **Command:**
 
