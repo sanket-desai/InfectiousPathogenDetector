@@ -36,7 +36,8 @@ class GlobalVar(object):
 	tabix_="../external/tabix/tabix"
 	lofreq_="../external/lofreq_star-2.1.2/bin/lofreq"
 	snpeff_="java -Xmx10G -jar ../external/snpEff/snpEff.jar"
-	freebayes_="../external/freebayes/bin/freebayes"
+	#freebayes_="../external/freebayes/bin/freebayes"
+	freebayes_="../external/freebayes/build/freebayes"
 	vcffilter_="../external/freebayes/vcflib/build/vcffilter"
 
 	##snpEff variant annotation
