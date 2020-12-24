@@ -98,11 +98,14 @@ fi
 #cd $home_folder
 #freebayes (freebayes requires g++, camke, the standard C and C++ development libraries, liblzma, pthread, and libbzip2.)
 cd $home_folder
-rm -rf $home_folder/external/freebayes
+#rm -rf $home_folder/external/freebayes
 cd $home_folder/external
-git clone --recursive https://github.com/ekg/freebayes.git
-cd freebayes && make
-
+#git clone --recursive https://github.com/ekg/freebayes.git
+#cd freebayes && make
+git clone --recursive https://github.com/freebayes/freebayes.git
+meson build/ --buildtype debug
+cd build
+ninja
 if [[ ! -f "$home_folder/external/freebayes/bin/freebayes" ]];
 then
 	#cd $home_folder/external/

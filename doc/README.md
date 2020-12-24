@@ -16,6 +16,7 @@ There are two automated interfaces for the tool either of them can be used by th
   - [Make](https://www.gnu.org/software/make/)
   - [CMAKE](https://cmake.org/install/)
   - [Java](https://java.com/en/download/)
+  - [Meson](https://mesonbuild.com/) 
 
 With the following system prerequisites in place, users can use the following commands in the Linux / Unix environment to install the required python packages.
 
