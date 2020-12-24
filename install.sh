@@ -106,7 +106,7 @@ git clone --recursive https://github.com/freebayes/freebayes.git
 meson build/ --buildtype debug
 cd build
 ninja
-if [[ ! -f "$home_folder/external/freebayes/bin/freebayes" ]];
+if [[ ! -f "$home_folder/external/freebayes/build/freebayes" ]];
 then
 	#cd $home_folder/external/
 	#git clone --recursive https://github.com/vcflib/vcflib.git
@@ -121,24 +121,31 @@ then
   abort
 fi
 
+#VCF filter
+cd $home_folder/external/freebayes/vcflib
+mkdir build
+cd build
+cmake ../
+
+if [[ ! -f "$home_folder/external/freebayes/vcflib/build/vcffilter" ]];
+then
+  echo "VCFlib installation failed!!"
+  abort
+fi
+cd $home_folder
 # minimap2
 
-if [[ ! -f "$home_folder/external/minimap2/minimap2" ]];
+if [[ ! -d "$home_folder/external/minimap2" ]];
 then
-	cd $home_folder/external/minimap2 && make clean && make && cd $home_folder
+	cd $home_folder/external
+  git clone https://github.com/lh3/minimap2
+  cd minimap2 && make
+  if [[ ! -f "minimap2" ]];
+  then
+    echo "Minimap2 installation failed!!"
+    abort
 fi
 
-#medaka (conda)
-
-#conda_env=$(conda info | grep -i 'base environment')
-#medaka_env=$(conda info --envs | grep "medaka")
-#if [[ -z $conda_env ]];
-#then
-#	echo "Install Conda!!!!!!!!!!!!!"
-#	abort
-#elif [[ -z $medaka_env ]];
-#	conda create -n medaka -c conda-forge -c bioconda medaka
-#fi
 
 #Install porechop
 rm -rf $home_folder/external/Porechop
